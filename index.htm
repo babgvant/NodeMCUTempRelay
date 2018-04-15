@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>     
+    <meta charset="utf-8" />     
+    <title>Temperature Relay</title>     
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">     
+    <meta name="viewport" content="width=device-width, initial-scale=1">     
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> 
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+</head> 
+<body>     
+    <h1 class="hidden-xs text-center">Temperature Relay</h1>     
+    <div class="container">             
+        <div class="row">                 
+            <div class="col-sm-4 col-sm-offset-0">                     
+                <h3 class="text-primary text-center">Switch</h3>                     
+                <button class="btn btn-block btn-lg btn-success clickme" role="button" name="switch" value="on">On</button>                     
+                <button class="btn btn-block btn-lg btn-danger clickme" role="button" name="switch" value="off">Off</button>               
+            </div>              
+        </div>  
+		<div class="row">                 
+    		<div class="col-sm-4 col-sm-offset-0">                     
+    			<h3 class="text-primary text-center">Current Values</h3>                     
+    			Temperature: <span id="spTemp" value="NA"></span>                       
+    			Humidity: <span id="spHumd" value="NA"></span>                         
+    			State: <span id="spState" value="NA"></span>       
+                <button class="btn btn-block btn-lg btn-success getme" role="button" name="switch" value="set">Refresh</button>                
+    		</div>  
+        </div>
+		<div class="row">                 
+    		<div class="col-sm-4 col-sm-offset-0">                     
+    			<h3 class="text-primary text-center">Threshold Values</h3>                     
+    			Off:<input id="txtLow" class="form-control" value="0"/>                     
+    			On:<input id="txtHigh" class="form-control" value="0"/>                      
+                Interval (seconds):<input id="txtInterval" class="form-control" value="0"/>   
+               
+                <button class="btn btn-block btn-lg btn-success setme" role="button" name="switch" value="set">Set Values</button>                   
+    		</div>              
+	    </div>     
+    </div> 
+    <div id="status" style="display:none"></div>
+    <script>
+        $( document ).ready(function() {
+            $('.clickme').click(function(){
+                //alert($(this).attr('value'));
+                var jqxhr = $.get( $(this).attr('value'), function() {
+                  //alert( "success" );
+                })
+                  .done(function() {
+                    $('#status').empty().append( " success" );
+                  })
+                  .fail(function() {
+                    $('#status').empty().append( "error" );
+                  });
+            });
+			
+			function getValues() {
+				var jqxhr = $.get( 'get', function() {
+					  //alert( "success" );
+				})
+				  .done(function(data) {
+					$('#spTemp').text(data.temp);
+					$('#spHumd').text(data.humidity);
+					$('#txtLow').val(data.low);
+					$('#txtHigh').val(data.high);
+                    $('#txtInterval').val(data.interval);
+                    $('#spState').text((data.switch_state == 0 ? 'off' : 'on'));
+				  })
+				  .fail(function() {
+					$('#status').empty().append( "error" );
+				  });
+			}
+
+            $('.getme').click(function(){
+                getValues();
+            });
+           
+            $('.setme').click(function(){
+                var url = "set?low=" + $('#txtLow').val() + "&high=" + $('#txtHigh').val() + "&interval=" + $('#txtInterval').val();
+                var jqxhr = $.get( url, function() {
+                      //alert( "success" );
+                })
+                  .done(function(data) {
+                    $('#status').empty().append( " success" );
+					getValues();
+                  })
+                  .fail(function() {
+                    $('#status').empty().append( "error" );
+                  });
+            });
+			
+			getValues();
+        }); 
+    </script>
+</body>
+</html>
