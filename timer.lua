@@ -8,7 +8,7 @@ dofile("poll_settings.lua")
 if chkTmr then chkTmr:unregister() chkTmr=nil end
 chkTmr = tmr.create()
 chkTmr:register(checkInterval*1000, tmr.ALARM_AUTO, function(t)
-   dofile("sensordata.lua")
+	dofile("sensordata.lua")
     if(dht_error ~= nil) then
         print ("DHT error: "..dht_error)
     else
