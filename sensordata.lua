@@ -16,10 +16,13 @@ if( status == dht.OK ) then
 	 print("temperature: "..temperature.." humidity: "..humidity)
 elseif( status == dht.ERROR_CHECKSUM ) then          
 	dht_error = "DHT Checksum error"
-	temperature=-1 --TEST
+	temperature=-9991 --TEST
 elseif( status == dht.ERROR_TIMEOUT ) then
 	dht_error ="DHT Time out"
-	temperature=-2 --TEST
+	temperature=-9992 --TEST
+else
+    dht_error ="DHT Error"
+    temperature=-9993 --TEST
 end
 
 -- Release module

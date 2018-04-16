@@ -1,42 +1,3 @@
-tempLow = 25
-tempHigh = 30
-switch1_pin = 1
-checkInterval = 60
-
-gpio.mode(switch1_pin, gpio.OUTPUT)
-dofile("sensordata.lua")
-
-local chkTmr = tmr.create()
-chkTmr:register(checkInterval*1000, tmr.ALARM_AUTO, function(t)
-   dofile("sensordata.lua")
-    if(dht_error ~= nil) then
-        print ("DHT error: "..dht_error)
-    else
-        local pinVal = gpio.read(switch1_pin)
-        local fTemp = tonumber(temperature)
-        
-        print ("pin: "..pinVal.." temp: "..temperature)
-        if(fTemp >= tempHigh) then
-            if(pinVal == gpio.LOW) then
-                print("enable relay")
-                gpio.write(switch1_pin, gpio.HIGH)
-            end
-        end
-        if(fTemp <= tempLow) then
-            if(pinVal == gpio.HIGH) then
-                print("disable relay")
-                gpio.write(switch1_pin, gpio.LOW)
-            end
-        end
-    end
-end) 
-
-if not chkTmr then
-    print("failed to create timer")
-else
-    chkTmr:start()
-end
-
 -- Connect 
 ip, nm, gw=wifi.sta.getip()
 print("IP address: ",ip)
@@ -95,6 +56,7 @@ srv:listen(80,function(conn)
 			elseif (cleanpath == "off") then
 				gpio.write(switch1_pin, gpio.LOW)
 			elseif (cleanpath == "get") then
+                dofile("sensordata.lua")
 				respText = respText .. "\"temp\": "..temperature..","
 				respText = respText .. "\"humidity\": "..humidity..","
 				respText = respText .. "\"interval\": "..checkInterval..","
@@ -114,7 +76,8 @@ srv:listen(80,function(conn)
 					if(formDATA["interval"]) then
 						checkInterval = tonumber(formDATA["interval"])
                         chkTmr:interval(checkInterval * 1000)
-					end				
+					end		
+                    dofile("write_poll_settings.lua")		
 				end
                 --print ("set1: low "..tempLow.." high "..tempHigh)
 			else

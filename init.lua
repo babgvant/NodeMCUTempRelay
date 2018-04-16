@@ -77,3 +77,5 @@ else
 end
 
 wifi.sta.connect()
+
+dofile("timer.lua")
